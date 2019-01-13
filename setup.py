@@ -26,8 +26,11 @@ setup(
         'validate-email'
     ],
     entry_points={
-        'console_scripts': [
-        ],
+        'console_scripts': {
+            'flask.commands': [
+                'assets = flask_assets:assets',
+            ]
+        },
     },
     license="MIT",
 )
