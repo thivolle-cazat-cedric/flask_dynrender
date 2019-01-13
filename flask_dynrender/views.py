@@ -51,9 +51,10 @@ class BaseView(FlaskMethodView):
         path = '{0}.{1}'.format(splitext(self.target)[0], self.TPL_EXT)
         pattern = join(dirname(self.target), '_pattern_.{0}'.format(self.TPL_EXT))
         try:
-            print(path, pattern)
             return current_app.jinja_env.select_template([path, pattern])
         except TemplateNotFound as e:
+            if current_app.debug:
+                raise e
             abort(404)
 
     def get_ctx_handler_class(self):

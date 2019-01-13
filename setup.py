@@ -19,6 +19,9 @@ setup(
         'Flask',
         'Flask-WTF',
         'Flask-Assets',
+        'Flask-Mail',
+        'Babel',
+        'webassets',
         'PyYAML',
         'validate-email'
     ],

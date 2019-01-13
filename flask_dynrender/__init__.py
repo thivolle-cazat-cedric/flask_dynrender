@@ -1,40 +1,16 @@
-import re
-import json
 from os import environ
 from os.path import isfile, join
 from configparser import ConfigParser
-from flask import Flask, request
+from flask import Flask
 from flask_assets import Environment
 from flask_mail import Mail
 from flask_wtf.recaptcha.validators import RECAPTCHA_ERROR_CODES
 from . import jinja_tools
 from .mail_handler import check_mail_conf
-
+from .utils import _cast_value, redirect_to_static, _get_realpath
 
 assets = Environment()
 mail = Mail()
-FLOAT_REG = re.compile(r'^\d?(\.|\,)\d+$')
-TRUE_VALUES = ('TRUE', 'YES',)
-FALSE_VALUES = ('FALSE', 'NO',)
-
-
-def _cast_value(value):
-    if not isinstance(value, str):
-        return value
-    try:
-        if value.isdigit():
-            return int(value)
-        if FLOAT_REG.match(value):
-            return float(value)
-        if value.upper() in TRUE_VALUES:
-            return True
-        if value.upper() in FALSE_VALUES:
-            return False
-        if value.startswith('{') and value.endswith('}'):
-            return json.loads(value)
-    except:
-        pass
-    return value
 
 
 def init_app(app, conf_file=None, flask_section='flask'):
@@ -59,8 +35,10 @@ def init_app(app, conf_file=None, flask_section='flask'):
             if conf_p.has_option(flask_section, key.lower()):
                 app.config[key] = conf_p.getboolean(flask_section, key.lower())
     tpl_folder = app.config.get('TEMPLATE_FOLDER', app.template_folder)
-    app.template_folder = tpl_folder
-    app.static_folder = app.config.get('STATIC_FOLDER', app.static_folder)
+    app.template_folder = _get_realpath(tpl_folder)
+    app.static_folder = _get_realpath(
+        app.config.get('STATIC_FOLDER', app.static_folder))
+    app.config['DATA_FOLDER'] = _get_realpath(app.config['DATA_FOLDER'])
     app.config_parser = conf_p
     app.conf_dynrender = {}
     app.logger.debug(
@@ -90,6 +68,12 @@ def init_urls(app):
     endpnt = app.conf_dynrender.get('ENDPOINT', 'root')
     app.add_url_rule('/', view_func=viewcls.as_view('%s_emtpy' % endpnt))
     app.add_url_rule('/<path:target>', view_func=viewcls.as_view(endpnt))
+    files_to_static = [
+        'favicon.ico', 'apple-touch-icon.png',
+    ]
+    for path in files_to_static:
+        app.add_url_rule('/%s' % path, 'static.%s' % path, redirect_to_static)
+        app.add_url_rule('/%s' % path, 'stattic.%s' % path, redirect_to_static)
 
 
 def init_assets(app):

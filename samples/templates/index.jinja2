@@ -1,0 +1,12 @@
+{% extends '_layout.jinja2' %}
+{% block main %}
+<h1>Hello {{yourname}}</h1>
+
+<ul>
+    {% for user in users if user.enabled %}
+       <li>{{user.name}}</li>
+    {%- endfor %}
+</ul>
+<pre>{{g}}</pre>
+<pre>{{__scope__|pprint}}</pre>
+{% endblock %}
