@@ -6,6 +6,7 @@ from .base import BaseContextHandler
 
 class IniContextHandler(BaseContextHandler):
 
+    ENCODING = 'utf-8'
     extension = 'ini'
     _list_reg = re.compile(
         r'^(?P<root>[a-zA-Z_0-9]+)\:(?P<index>[0-9]+)$')
@@ -77,7 +78,7 @@ class IniContextHandler(BaseContextHandler):
             interpolation=ExtendedInterpolation(),
             inline_comment_prefixes=(';#',)
         )
-        conf.read(target)
+        conf.read(target, encoding=self.ENCODING)
         data = {}
         _keys = conf.sections()
         dict_items = self._find_dict_keys(_keys)
