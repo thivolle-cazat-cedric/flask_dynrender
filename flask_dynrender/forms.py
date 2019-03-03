@@ -17,7 +17,7 @@ class ContactBaseForm(FlaskForm):
     message = TextAreaField('message', validators=[
         DataRequired(message="Obligatoir"),
         Length(min=3, message="Doit contenir au moins %(min)s caractères")])
-    # recaptcha = RecaptchaField('recaptcha')
+    recaptcha = RecaptchaField('recaptcha')
 
     def validate_email(self, field):
         if not validate_email(field.data):

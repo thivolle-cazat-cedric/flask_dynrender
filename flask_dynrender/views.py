@@ -77,7 +77,7 @@ class BaseView(FlaskMethodView):
         ctx = ctx_handler.get_scope()
         ctx['META'] = ctx_handler.get_meta()
         ctx['__kwargs__'] = ctx_handler.get_uri_kwargs()
-        if current_app.contact_uri == request.path:
+        if request.path in current_app.contact_uris:
             ctx['form'] = self.kwargs.get(
                 'form', get_form_class(current_app)())
         return ctx

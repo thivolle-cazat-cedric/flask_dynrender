@@ -89,11 +89,15 @@ def init_assets(app):
 
 
 def init_contact(app):
-    app.contact_uri = None
+    app.contact_uris = []
     if not app.config_parser.has_section('contact'):
         return False
     recapt_key = ('USE_SSL', 'PUBLIC_KEY', 'PRIVATE_KEY', 'PARAMETERS')
-    app.contact_uri = app.config_parser.get('contact', 'uri')
+    app.contact_uris += [
+        uri.strip()
+        for uri in app.config_parser.get('contact', 'uri').split(',')
+        if uri.strip()
+    ]
     contact = {
         ('RECAPTCHA_%s' % opt.upper()):
             _cast_value(app.config_parser.get('contact', opt))
